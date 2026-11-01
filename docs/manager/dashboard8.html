@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<script src="../demo-api.js" charset="utf-8"></script>
+<title>تجميع البلاغات والشكاوى والمحاضر — جميع الأقسام</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="manager.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="mgr-layout">
+
+  <aside class="mgr-sidebar">
+    <div class="mgr-sidebar-brand">
+      <div class="mgr-sidebar-brand-title">نظام الإحصائيات اليومية</div>
+      <div class="mgr-sidebar-brand-sub">شركة رحلات ومنافع — لوحة البيانات</div>
+    </div>
+    <nav class="mgr-sidebar-nav" id="mgr-sidebar-nav"></nav>
+    <div class="mgr-sidebar-bottom">
+      <div class="mgr-user" id="mgr-user-info">—</div>
+      <button class="mgr-signout-btn" id="mgr-signout-btn">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="mgr-main">
+
+    <header class="mgr-topbar">
+      <div>
+        <div class="mgr-page-title">تجميع البلاغات والشكاوى والمحاضر — جميع الأقسام</div>
+        <div class="mgr-page-sub">عرض مفصل لكل نوع على حدة عبر جميع الأقسام</div>
+      </div>
+      <div class="mgr-status">
+        <span class="mgr-status-dot">
+          <span class="mgr-dot" id="mgr-dot"></span>
+          <span id="mgr-status-label">يجري الاتصال…</span>
+        </span>
+        <span id="mgr-last-updated">—</span>
+        <span class="mgr-actions" style="display:flex;gap:6px;">
+          <a class="mgr-btn back" id="btn-back-entry" href="../index.html" style="text-decoration:none;">العودة لإدخال البيانات →</a>
+          <button class="mgr-btn" id="btn-refresh">تحديث يدوي</button>
+          <button class="mgr-btn" id="btn-print">طباعة PDF</button>
+          <button class="mgr-btn" id="btn-export">تصدير Excel</button>
+        </span>
+      </div>
+    </header>
+
+    <section class="mgr-filterbar" id="mgr-filterbar"></section>
+
+    <div class="mgr-body">
+
+      <!-- Three always-visible count pills (per Hattan: counts always separated) -->
+      <div class="mini-stats" id="agg-count-pills" style="margin-bottom:14px;">
+        <div class="mini-stat red"><span class="mini-icon">!</span><div class="mini-body"><span class="mini-label">إجمالي المحاضر</span><span class="mini-value" id="count-mahadir">0</span></div></div>
+        <div class="mini-stat gold"><span class="mini-icon">⚑</span><div class="mini-body"><span class="mini-label">إجمالي الشكاوى</span><span class="mini-value" id="count-shakawi">0</span></div></div>
+        <div class="mini-stat green"><span class="mini-icon">⚐</span><div class="mini-body"><span class="mini-label">إجمالي البلاغات</span><span class="mini-value" id="count-balaghat">0</span></div></div>
+      </div>
+
+      <!-- Two tables: المحاضر + الشكاوى والبلاغات (combined with type filter) -->
+      <div class="mgr-tabs" id="agg-tabs">
+        <button class="mgr-tab active" data-tab="mahadir">جدول المحاضر</button>
+        <button class="mgr-tab" data-tab="complaints">جدول الشكاوى والبلاغات</button>
+      </div>
+
+      <div class="card-grid-2" style="margin-bottom:18px;">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title" id="breakdown-title">التوزيع</div>
+            <div class="card-badge">حسب الفلتر الحالي</div>
+          </div>
+          <div class="card-body-chart"><canvas id="chart-breakdown"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">الإجمالي</div>
+            <div class="card-badge" id="badge-total">0</div>
+          </div>
+          <div style="padding:24px;text-align:center;">
+            <div class="kpi-num" id="big-total" style="font-size:48px;">0</div>
+            <div class="kpi-label" id="big-total-label">عدد السجلات المطابقة للفلتر</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title" id="agg-table-title">السجلات</div>
+          <div id="pagination-controls" style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--text-muted);"></div>
+        </div>
+
+        <!-- Inline filter, lives ON the complaints table itself -->
+        <div id="kind-toggle" class="kind-toggle" style="display:none;">
+          <span class="kind-toggle-label">تصنيف:</span>
+          <button type="button" class="kind-btn active" data-kind="">الكل</button>
+          <button type="button" class="kind-btn" data-kind="شكوى">شكاوى فقط</button>
+          <button type="button" class="kind-btn" data-kind="بلاغ">بلاغات فقط</button>
+        </div>
+
+        <div class="mgr-table-wrap">
+          <table class="mgr-table" id="agg-table">
+            <thead id="agg-thead"></thead>
+            <tbody id="agg-tbody"></tbody>
+          </table>
+        </div>
+        <div class="mgr-empty" id="empty-agg" style="display:none;">لا توجد سجلات مطابقة للفلتر</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="manager.js"></script>
+<script>
+  if (MGR.guardPage(8)) {
+    MGR.renderShell(8);
+    var agg = window.AggPage = (function () {
+      var currentTab = 'mahadir';
+      var page = 1, pageSize = 50;
+      var chart = null;
+
+      function activeFilters() {
+        var p = MGR.params();
+        var q = new URLSearchParams();
+        q.set('tab', currentTab);
+        ['date_mode','date_from','date_to','section_number','violation_type_id','responsible_party_id','source_party_id','complaint_kind'].forEach(function (k) {
+          if (p[k]) q.set(k, p[k]);
+        });
+        q.set('page', String(page));
+        q.set('page_size', String(pageSize));
+        return q.toString();
+      }
+
+      function thead(cols) {
+        var thead = document.getElementById('agg-thead');
+        while (thead.firstChild) thead.removeChild(thead.firstChild);
+        var tr = document.createElement('tr');
+        cols.forEach(function (c) {
+          var th = document.createElement('th');
+          th.textContent = c;
+          tr.appendChild(th);
+        });
+        thead.appendChild(tr);
+      }
+
+      function fillBody(rows, columns) {
+        var tbody = document.getElementById('agg-tbody');
+        while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+        if (!rows.length) {
+          document.getElementById('empty-agg').style.display = 'block';
+          return;
+        }
+        document.getElementById('empty-agg').style.display = 'none';
+        rows.forEach(function (r, i) {
+          var tr = document.createElement('tr');
+          columns.forEach(function (col) {
+            var td = document.createElement('td');
+            var v = col.fn ? col.fn(r, i) : r[col.key];
+            td.textContent = v == null ? '' : String(v);
+            if (col.wrap) td.className = 'wrap';
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      }
+
+      function aggregateRows(rows, nameKey) {
+        var counts = {};
+        rows.forEach(function (r) {
+          var k = r[nameKey] || 'غير محدد';
+          counts[k] = (counts[k] || 0) + 1;
+        });
+        return Object.keys(counts)
+          .map(function (k) { return { name_ar: k, count: counts[k] }; })
+          .sort(function (a, b) { return b.count - a.count; });
+      }
+
+      function renderBreakdown(items, label) {
+        var canvas = document.getElementById('chart-breakdown');
+        document.getElementById('breakdown-title').textContent = label;
+        if (chart) chart.destroy();
+        var nonZero = (items || []).filter(function (b) { return (b.count || 0) > 0; });
+        if (!nonZero.length) {
+          var ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#9ab0a0';
+          ctx.font = '13px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('لا توجد بيانات', canvas.width / 2, canvas.height / 2);
+          return;
+        }
+        var colors = ['#1a7a3f', '#c9a84c', '#d64545', '#2563a8', '#888780', '#0f4d2a', '#a16207'];
+        chart = new Chart(canvas, {
+          type: 'doughnut',
+          data: {
+            labels: nonZero.map(function (b) { return b.name_ar; }),
+            datasets: [{
+              data: nonZero.map(function (b) { return b.count; }),
+              backgroundColor: nonZero.map(function (_, i) { return colors[i % colors.length]; }),
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: '62%',
+            plugins: { legend: { position: 'right', labels: { font: { size: 11 } } } }
+          }
+        });
+      }
+
+      function renderPagination(total, page, pageSize) {
+        var ctrls = document.getElementById('pagination-controls');
+        while (ctrls.firstChild) ctrls.removeChild(ctrls.firstChild);
+        var pages = Math.max(1, Math.ceil(total / pageSize));
+        var info = document.createElement('span');
+        info.textContent = 'صفحة ' + page + ' من ' + pages + ' · إجمالي ' + total;
+        var prev = document.createElement('button');
+        prev.className = 'mgr-btn ghost';
+        prev.textContent = 'السابق';
+        prev.disabled = page <= 1;
+        prev.addEventListener('click', function () { agg.goPage(page - 1); });
+        var next = document.createElement('button');
+        next.className = 'mgr-btn ghost';
+        next.textContent = 'التالي';
+        next.disabled = page >= pages;
+        next.addEventListener('click', function () { agg.goPage(page + 1); });
+        ctrls.appendChild(info);
+        ctrls.appendChild(prev);
+        ctrls.appendChild(next);
+      }
+
+      function refreshAllTabCounts() {
+        // Always-visible 3 separate counts (محاضر / شكاوى / بلاغات), regardless of active tab.
+        // Date + section filters apply; violation/source/kind filters do NOT (since the
+        // 3 pills must always represent each independent total).
+        ['mahadir', 'shakawi', 'balaghat'].forEach(function (tab) {
+          var p = MGR.params();
+          var q = new URLSearchParams();
+          q.set('tab', tab);
+          ['date_mode','date_from','date_to','section_number'].forEach(function (k) {
+            if (p[k]) q.set(k, p[k]);
+          });
+          q.set('page', '1');
+          q.set('page_size', '1');
+          fetch('/api/manager/aggregate?' + q.toString())
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              if (data && data.status === 'ok') {
+                var el = document.getElementById('count-' + tab);
+                if (el) el.textContent = data.total;
+              }
+            }).catch(function () {});
+        });
+      }
+
+      function load() {
+        if (MGR.showLoading) MGR.showLoading('جارٍ تحميل البيانات…');
+        refreshAllTabCounts();
+        var url = '/api/manager/aggregate?' + activeFilters();
+        fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+          if (!data || data.status !== 'ok') { MGR.toast('فشل تحميل البيانات'); if (MGR.hideLoading) MGR.hideLoading(); return; }
+
+          document.getElementById('badge-total').textContent = data.total;
+          document.getElementById('big-total').textContent = data.total;
+          // (3 separate count pills are kept in sync by refreshAllTabCounts())
+
+          var rows = data.rows || [];
+          var columns;
+          if (currentTab === 'mahadir') {
+            document.getElementById('agg-table-title').textContent = 'سجلات المحاضر';
+            document.getElementById('big-total-label').textContent = 'إجمالي المحاضر المطابقة للفلتر';
+            renderBreakdown(data.breakdown, 'توزيع نوع المخالفة');
+            columns = [
+              { key: '_idx', fn: function (_, i) { return (page - 1) * pageSize + i + 1; } },
+              { key: 'shift_date' },
+              { key: 'section_number' },
+              { key: 'report_number' },
+              { key: 'violation_name' },
+              { key: 'location_name' },
+              { key: 'responsible_party_name' },
+              { key: 'start_time' },
+              { key: 'end_time' },
+              { key: 'processing_minutes' },
+              { key: 'notes', wrap: true },
+              { key: 'employee_name' }
+            ];
+            thead(['#', 'التاريخ', 'القسم', 'رقم المحضر', 'نوع المخالفة', 'موقع الحالة', 'الجهة المعدة للمحضر', 'وقت البداية', 'وقت النهاية', 'زمن المعالجة', 'الملاحظات', 'الموظف']);
+          } else {
+            // Combined complaints tab — table includes the type column so user can see شكوى/بلاغ.
+            document.getElementById('agg-table-title').textContent = 'سجلات الشكاوى والبلاغات';
+            document.getElementById('big-total-label').textContent = 'إجمالي السجلات المطابقة للفلتر';
+            renderBreakdown(data.breakdown, 'توزيع جهة الإصدار');
+            columns = [
+              { key: '_idx', fn: function (_, i) { return (page - 1) * pageSize + i + 1; } },
+              { key: 'shift_date' },
+              { key: 'section_number' },
+              { key: 'case_number' },
+              { key: 'type' },
+              { key: 'source_party_name' },
+              { key: 'start_time' },
+              { key: 'end_time' },
+              { key: 'processing_minutes' },
+              { key: 'notes', wrap: true },
+              { key: 'employee_name' }
+            ];
+            thead(['#', 'التاريخ', 'القسم', 'رقم الحالة', 'تصنيف (شكوى / بلاغ)', 'جهة البلاغ أو الشكوى', 'وقت البداية', 'وقت النهاية', 'زمن المعالجة', 'الملاحظات', 'الموظف']);
+          }
+          fillBody(rows, columns);
+          renderPagination(data.total, page, pageSize);
+          MGR.setLastUpdated();
+          if (MGR.hideLoading) MGR.hideLoading();
+        }).catch(function (err) {
+          console.error('[dashboard8] load failed:', err);
+          MGR.toast('خطأ في عرض البيانات: ' + (err && err.message ? err.message : err));
+          if (MGR.hideLoading) MGR.hideLoading();
+        });
+      }
+
+      function setTab(tab) {
+        currentTab = tab;
+        page = 1;
+        document.querySelectorAll('.mgr-tab').forEach(function (b) {
+          b.classList.toggle('active', b.dataset.tab === tab);
+        });
+        // Per Hattan's filter spec:
+        // جدول المحاضر         → القسم + نوع المخالفة + الجهة المعدة للمحضر  (in top filter bar)
+        // جدول الشكاوى والبلاغات → القسم + جهة البلاغ أو الشكوى (top bar) + التصنيف (on the table itself)
+        MGR.renderFilters({
+          showSection: true,
+          showViolation:        tab === 'mahadir',
+          showResponsibleParty: tab === 'mahadir',
+          showSourceParty:      tab === 'complaints',
+          showComplaintKind:    false,   // moved onto the table
+          onChange: function () { page = 1; load(); }
+        });
+        // Show the on-table type toggle only on the complaints tab
+        var toggle = document.getElementById('kind-toggle');
+        if (toggle) toggle.style.display = (tab === 'complaints') ? 'flex' : 'none';
+        // Reflect current URL state in the toggle buttons
+        var current = MGR.params().complaint_kind || '';
+        document.querySelectorAll('.kind-btn').forEach(function (b) {
+          b.classList.toggle('active', (b.dataset.kind || '') === current);
+        });
+        load();
+      }
+
+      // Wire the on-table type toggle (شكاوى/بلاغات/الكل)
+      document.querySelectorAll('.kind-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.kind-btn').forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var kind = btn.dataset.kind || '';
+          MGR.setParams({ complaint_kind: kind });
+          page = 1;
+          load();
+        });
+      });
+
+      function goPage(p) { page = p; load(); }
+
+      document.querySelectorAll('.mgr-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () { setTab(btn.dataset.tab); });
+      });
+      document.getElementById('btn-refresh').addEventListener('click', load);
+      document.getElementById('btn-print').addEventListener('click', MGR.printPage);
+      document.getElementById('btn-export').addEventListener('click', function () {
+        MGR.exportTableToExcel(document.getElementById('agg-table'), 'aggregate_' + currentTab);
+      });
+
+      MGR.startStream(function () { load(); refreshAllTabCounts(); });
+      MGR.setStatus('warn', 'جارٍ الاتصال…');
+      // Initial 3-pill counts even before the user clicks a tab
+      refreshAllTabCounts();
+      setTab('mahadir');
+
+      return { goPage: goPage, load: load };
+    })();
+  }
+</script>
+<footer>
+  <div class="footer-rights">
+    جميع الحقوق محفوظة لشركة رحلات ومنافع فرع المدينة المنورة
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-dev">
+    <div class="footer-dev-label">Developed &amp; Designed by</div>
+    <div class="footer-dev-name">Eng. Lama Aljohani</div>
+    <div class="footer-dev-title">مهندسة برمجيات — مطورة النظام</div>
+    <div class="footer-dev-email">
+      <a href="mailto:lamaaljohani88@gmail.com">lamaaljohani88@gmail.com</a>
+    </div>
+  </div>
+  <div class="footer-bottom-line">
+    Hajj Management System v1.0 &nbsp;|&nbsp; ©️ 2026 All Rights Reserved
+  </div>
+</footer>
+
+</body>
+</html>

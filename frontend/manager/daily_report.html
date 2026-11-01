@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>التقرير اليومي — تقرير اعمال الحج 1447هـ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="manager.css">
+<link rel="stylesheet" href="daily_report.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="mgr-layout">
+
+  <aside class="mgr-sidebar">
+    <div class="mgr-sidebar-brand">
+      <div class="mgr-sidebar-brand-title">نظام الإحصائيات اليومية</div>
+      <div class="mgr-sidebar-brand-sub">شركة رحلات ومنافع — لوحة البيانات</div>
+    </div>
+    <nav class="mgr-sidebar-nav" id="mgr-sidebar-nav"></nav>
+    <div class="mgr-sidebar-bottom">
+      <div class="mgr-user" id="mgr-user-info">—</div>
+      <button class="mgr-signout-btn" id="mgr-signout-btn">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="mgr-main">
+
+    <header class="mgr-topbar no-print">
+      <div>
+        <div class="mgr-page-title">التقرير اليومي</div>
+        <div class="mgr-page-sub">تقرير اعمال الحج 1447هـ — اختر التاريخ ثم اطبع</div>
+      </div>
+      <div class="mgr-status">
+        <input type="date" id="report-date" class="mgr-btn" style="padding:6px 10px;">
+        <a class="mgr-btn back" href="../index.html" style="text-decoration:none;">العودة لإدخال البيانات →</a>
+        <button class="mgr-btn primary" id="btn-print-report" title="عند الطباعة: في نافذة الطباعة، ألغِ تفعيل خيار &quot;الرؤوس والتذييلات&quot; (Headers and footers) لإزالة عنوان URL من الورقة">طباعة التقرير</button>
+      </div>
+    </header>
+
+    <div class="mgr-body">
+      <div id="report-container" class="report-page">
+        <div class="rpt-loader">جارٍ تحميل البيانات…</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="manager.js"></script>
+<script src="daily_report.js"></script>
+<footer>
+  <div class="footer-rights">
+    جميع الحقوق محفوظة لشركة رحلات ومنافع فرع المدينة المنورة
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-dev">
+    <div class="footer-dev-label">Developed &amp; Designed by</div>
+    <div class="footer-dev-name">Eng. Lama Aljohani</div>
+    <div class="footer-dev-title">مهندسة برمجيات — مطورة النظام</div>
+    <div class="footer-dev-email">
+      <a href="mailto:lamaaljohani88@gmail.com">lamaaljohani88@gmail.com</a>
+    </div>
+  </div>
+  <div class="footer-bottom-line">
+    Hajj Management System v1.0 &nbsp;|&nbsp; ©️ 2026 All Rights Reserved
+  </div>
+</footer>
+
+</body>
+</html>

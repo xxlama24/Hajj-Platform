@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>لوحة البيانات — تحويل</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; text-align: center; color: #5a7060; direction: rtl; }</style>
+</head>
+<body>
+<p>جارٍ تحويلك إلى لوحة البيانات المناسبة…</p>
+<script>
+  (function () {
+    var u = null;
+    try { u = JSON.parse(localStorage.getItem('user')); } catch (e) { u = null; }
+    if (!u) { window.location.href = 'login.html'; return; }
+    if (u.role === 'full_access' || u.role === 'manager') {
+      window.location.href = 'manager/dashboard1.html';
+      return;
+    }
+    var m = (u.role || '').match(/^section_([1-7])$/);
+    if (m) {
+      window.location.href = 'manager/dashboard' + m[1] + '.html';
+      return;
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+<footer>
+  <div class="footer-rights">
+    جميع الحقوق محفوظة لشركة رحلات ومنافع فرع المدينة المنورة
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-dev">
+    <div class="footer-dev-label">Developed &amp; Designed by</div>
+    <div class="footer-dev-name">Eng. Lama Aljohani</div>
+    <div class="footer-dev-title">مهندسة برمجيات — مطورة النظام</div>
+    <div class="footer-dev-email">
+      <a href="mailto:lamaaljohani88@gmail.com">lamaaljohani88@gmail.com</a>
+    </div>
+  </div>
+  <div class="footer-bottom-line">
+    Hajj Management System v1.0 &nbsp;|&nbsp; ©️ 2026 All Rights Reserved
+  </div>
+</footer>
+
+</body>
+</html>

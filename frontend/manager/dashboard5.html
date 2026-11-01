@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>لوحة البيانات — القسم 5 نسك</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="manager.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="mgr-layout">
+
+  <aside class="mgr-sidebar">
+    <div class="mgr-sidebar-brand">
+      <div class="mgr-sidebar-brand-title">نظام الإحصائيات اليومية</div>
+      <div class="mgr-sidebar-brand-sub">شركة رحلات ومنافع — لوحة البيانات</div>
+    </div>
+    <nav class="mgr-sidebar-nav" id="mgr-sidebar-nav"></nav>
+    <div class="mgr-sidebar-bottom">
+      <div class="mgr-user" id="mgr-user-info">—</div>
+      <button class="mgr-signout-btn" id="mgr-signout-btn">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="mgr-main">
+
+    <header class="mgr-topbar">
+      <div>
+        <div class="mgr-page-title">لوحة القسم 5 نسك</div>
+        <div class="mgr-page-sub">جميع البيانات والمحاضر والشكاوى والبلاغات والمرفقات</div>
+      </div>
+      <div class="mgr-status">
+        <span class="mgr-status-dot">
+          <span class="mgr-dot" id="mgr-dot"></span>
+          <span id="mgr-status-label">يجري الاتصال…</span>
+        </span>
+        <span id="mgr-last-updated">—</span>
+        <span class="mgr-actions" style="display:flex;gap:6px;">
+          <a class="mgr-btn back" id="btn-back-entry" href="../index.html" style="text-decoration:none;">العودة لإدخال البيانات →</a>
+          <button class="mgr-btn" id="btn-refresh">تحديث يدوي</button>
+          <button class="mgr-btn" id="btn-print">طباعة PDF</button>
+        </span>
+      </div>
+    </header>
+
+    <section class="mgr-filterbar" id="mgr-filterbar"></section>
+
+    <div class="mgr-body">
+
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="mini-stats" id="mini-stats"></div>
+
+
+      <div class="card-grid-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">توزيع أنواع المخالفات</div>
+            <div class="card-badge">حسب الفلتر الحالي</div>
+          </div>
+          <div class="card-body-chart"><canvas id="chart-violations"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">التراكم اليومي — محاضر / شكاوى / بلاغات / مرفقات</div>
+            <div class="card-badge">خط زمني</div>
+          </div>
+          <div class="card-body-chart"><canvas id="chart-trend"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">الأحداث اليومية — أعمدة مكدّسة</div>
+            <div class="card-badge">محاضر / شكاوى / بلاغات / مرفقات</div>
+          </div>
+          <div class="card-body-chart"><canvas id="chart-daily-bar"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">الشكاوى والبلاغات حسب اليوم</div>
+            <div class="card-badge">أعمدة أفقية</div>
+          </div>
+          <div class="card-body-chart"><canvas id="chart-incidents"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card-grid-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">توزيع الشكاوى والبلاغات حسب الجهة</div>
+            <div class="card-badge">دائرة</div>
+          </div>
+          <div class="card-body-chart"><canvas id="chart-sources"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">أعلى الجهات المسؤولة عن المحاضر</div>
+            <div class="card-badge">ترتيب تنازلي</div>
+          </div>
+          <div class="card-body-chart"><canvas id="chart-parties"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card-grid-2" style="margin-bottom:18px;">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">آخر النشاط</div>
+            <div class="card-badge">أحدث ١٢ حدث</div>
+          </div>
+          <div class="activity-list" id="activity-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">المؤشرات السريعة</div>
+            <div class="card-badge">حسب الفلتر الحالي</div>
+          </div>
+          <div style="font-size:12px;color:#5a7060;line-height:1.7;padding:8px 4px;">
+            تظهر الرسومات أعلاه جميع البيانات المدخلة في هذا القسم. استخدم الفلاتر بالأعلى لتغيير النطاق الزمني، ونوع المخالفة، أو الجهة المسؤولة. يتم التحديث تلقائياً عند إدخال أي بيانات جديدة.
+          </div>
+        </div>
+      </div>
+      <section id="section-insights" class="card-grid-2" style="margin-bottom:18px;"></section>
+
+
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-hdr">
+          <div class="card-title">بيانات القسم — بطاقات نسك</div>
+          <div>
+            <button class="mgr-btn" id="btn-export-section">تصدير Excel</button>
+          </div>
+        </div>
+        <div class="mgr-table-wrap">
+          <table class="mgr-table" id="tbl-section">
+            <thead><tr>
+              <th>التاريخ</th><th>الموظف</th>
+              <th>بطاقات الأرشيف</th><th>البطاقات المفعّلة</th><th>إجمالي الواصلين</th><th>بطاقات لم تُستلم</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="mgr-empty" id="empty-section" style="display:none;">لا توجد بيانات قسم</div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-hdr">
+          <div class="card-title">المحاضر</div>
+          <div>
+            <span class="card-badge" id="badge-mahadir">0</span>
+            <button class="mgr-btn" id="btn-export-mahadir" style="margin-right:8px;">تصدير Excel</button>
+          </div>
+        </div>
+        <div class="mgr-table-wrap">
+          <table class="mgr-table" id="tbl-mahadir">
+            <thead><tr>
+              <th>#</th><th>التاريخ</th><th>رقم المحضر</th>
+              <th>نوع المخالفة</th><th>موقع الحالة</th><th>الجهة المعدة للمحضر</th>
+              <th>وقت البداية</th><th>وقت النهاية</th><th>زمن المعالجة</th>
+              <th>الملاحظات</th><th>الموظف</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="mgr-empty" id="empty-mahadir" style="display:none;">لا توجد محاضر</div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-hdr">
+          <div class="card-title">الشكاوى</div>
+          <div>
+            <span class="card-badge" id="badge-shakawi">0</span>
+            <button class="mgr-btn" id="btn-export-shakawi" style="margin-right:8px;">تصدير Excel</button>
+          </div>
+        </div>
+        <div class="mgr-table-wrap">
+          <table class="mgr-table" id="tbl-shakawi">
+            <thead><tr>
+              <th>#</th><th>التاريخ</th><th>رقم الحالة</th>
+              <th>جهة البلاغ أو الشكوى</th><th>وقت البداية</th><th>وقت النهاية</th>
+              <th>زمن المعالجة</th><th>الملاحظات</th><th>الموظف</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="mgr-empty" id="empty-shakawi" style="display:none;">لا توجد شكاوى</div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-hdr">
+          <div class="card-title">البلاغات</div>
+          <div>
+            <span class="card-badge" id="badge-balaghat">0</span>
+            <button class="mgr-btn" id="btn-export-balaghat" style="margin-right:8px;">تصدير Excel</button>
+          </div>
+        </div>
+        <div class="mgr-table-wrap">
+          <table class="mgr-table" id="tbl-balaghat">
+            <thead><tr>
+              <th>#</th><th>التاريخ</th><th>رقم الحالة</th>
+              <th>جهة البلاغ أو الشكوى</th><th>وقت البداية</th><th>وقت النهاية</th>
+              <th>زمن المعالجة</th><th>الملاحظات</th><th>الموظف</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="mgr-empty" id="empty-balaghat" style="display:none;">لا توجد بلاغات</div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">المرفقات</div>
+          <div><span class="card-badge" id="badge-attachments">0</span></div>
+        </div>
+        <div class="attach-grid" id="attach-grid"></div>
+        <div class="mgr-empty" id="empty-attachments" style="display:none;">لا توجد مرفقات</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="manager.js"></script>
+<script src="dashboard.js"></script>
+<script>
+  if (MGR.guardPage(5)) {
+    MGR.renderShell(5);
+    MGR.renderFilters({ showViolation: true, showResponsibleParty: true, onChange: function () { DashboardPage.load(); } });
+    DashboardPage.init({
+      sectionNumber: 5,
+      sectionColumns: [
+        { key: "shift_date", source: "shift" },
+        { key: "employee_name", source: "shift" },
+        { key: "archive_cards" },
+        { key: "activated_cards" },
+        { key: "total_arrivals" },
+        { key: "unreceived_cards" }
+      ],
+      renderSectionInsights: function (data) {
+        var rows = (data.section_data && data.section_data.section5_nusuk) || [];
+        var shiftMap = {}; (data.shifts || []).forEach(function (s) { shiftMap[s.id] = s; });
+        var byDay = {};
+        rows.forEach(function (r) {
+          var d = (shiftMap[r.shift_id] || {}).shift_date || '—';
+          if (!byDay[d]) byDay[d] = { ar: 0, ac: 0, ta: 0, un: 0 };
+          byDay[d].ar += (r.archive_cards || 0);
+          byDay[d].ac += (r.activated_cards || 0);
+          byDay[d].ta += (r.total_arrivals || 0);
+          byDay[d].un += (r.unreceived_cards || 0);
+        });
+        var days = Object.keys(byDay).sort();
+        var ins = document.getElementById('section-insights');
+        while (ins.firstChild) ins.removeChild(ins.firstChild);
+        var card = document.createElement('div'); card.className = 'card';
+        card.style.gridColumn = '1 / -1';
+        var hdr = document.createElement('div'); hdr.className = 'card-hdr';
+        var t = document.createElement('div'); t.className = 'card-title'; t.textContent = 'بطاقات نسك حسب اليوم';
+        var b = document.createElement('div'); b.className = 'card-badge'; b.textContent = 'أرشيف / مفعّل / واصلون / لم تُستلم';
+        hdr.appendChild(t); hdr.appendChild(b); card.appendChild(hdr);
+        var body = document.createElement('div'); body.className = 'card-body-chart'; body.style.height = '300px';
+        var canv = document.createElement('canvas'); canv.id = 'chart-nusuk'; body.appendChild(canv); card.appendChild(body);
+        ins.appendChild(card);
+
+        if (window._s5Chart) { try { window._s5Chart.destroy(); } catch (e) {} }
+        window._s5Chart = new Chart(canv, {
+          type: 'bar',
+          data: { labels: days,
+            datasets: [
+              { label: 'أرشيف',     data: days.map(function (d) { return byDay[d].ar; }), backgroundColor: '#888780', borderRadius: 4 },
+              { label: 'مفعّلة',    data: days.map(function (d) { return byDay[d].ac; }), backgroundColor: '#1a7a3f', borderRadius: 4 },
+              { label: 'إجمالي الواصلين', data: days.map(function (d) { return byDay[d].ta; }), backgroundColor: '#2563a8', borderRadius: 4 },
+              { label: 'لم تُستلم', data: days.map(function (d) { return byDay[d].un; }), backgroundColor: '#d64545', borderRadius: 4 }
+            ]
+          },
+          options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+            scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.05)' }, beginAtZero: true } } }
+        });
+      }
+    });
+  }
+</script>
+<footer>
+  <div class="footer-rights">
+    جميع الحقوق محفوظة لشركة رحلات ومنافع فرع المدينة المنورة
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-dev">
+    <div class="footer-dev-label">Developed &amp; Designed by</div>
+    <div class="footer-dev-name">Eng. Lama Aljohani</div>
+    <div class="footer-dev-title">مهندسة برمجيات — مطورة النظام</div>
+    <div class="footer-dev-email">
+      <a href="mailto:lamaaljohani88@gmail.com">lamaaljohani88@gmail.com</a>
+    </div>
+  </div>
+  <div class="footer-bottom-line">
+    Hajj Management System v1.0 &nbsp;|&nbsp; ©️ 2026 All Rights Reserved
+  </div>
+</footer>
+
+</body>
+</html>

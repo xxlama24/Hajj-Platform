@@ -1,0 +1,200 @@
+/* Daily report — A4-portrait fixed layout matching the Hajj 1447 report PDF */
+
+.report-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: #fff;
+  padding: 16mm 14mm;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  font-family: var(--font-sans);
+  color: var(--text);
+  font-size: 11px;
+  direction: rtl;
+}
+
+.rpt-loader { padding: 60px; text-align: center; color: var(--text-muted); }
+
+.rpt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid var(--green-dark);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+.rpt-header-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--green-dark);
+  margin: 0;
+}
+.rpt-header-date {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.rpt-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.rpt-logo-img {
+  width: 90px;
+  height: auto;
+  max-height: 90px;
+  object-fit: contain;
+  display: block;
+}
+
+.rpt-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green-dark);
+  margin: 12px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--green-brand);
+}
+
+.rpt-ports {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.rpt-port {
+  border: 1px solid var(--border);
+  border-right: 3px solid var(--gold);
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 10px;
+}
+.rpt-port-name {
+  font-weight: 600;
+  color: var(--green-dark);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+.rpt-port-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  border-bottom: 1px dotted var(--border);
+}
+.rpt-port-row:last-child { border-bottom: none; }
+.rpt-port-label { color: var(--text-muted); }
+.rpt-port-value { font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+
+.rpt-chart-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.rpt-chart {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px;
+  height: 180px;
+  position: relative;
+}
+.rpt-totals { display: flex; flex-direction: column; gap: 8px; }
+.rpt-total-card {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 10px;
+  text-align: center;
+}
+.rpt-total-num {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--green-brand);
+  font-variant-numeric: tabular-nums;
+}
+.rpt-total-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+.rpt-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.rpt-block {
+  border: 1px solid var(--border);
+  border-right: 3px solid var(--green-brand);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.rpt-block.gold { border-right-color: var(--gold); }
+.rpt-block-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-dark);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.rpt-metric {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 10px;
+}
+.rpt-metric-label { color: var(--text); flex: 1; }
+.rpt-metric-value {
+  font-weight: 600;
+  color: var(--green-brand);
+  font-variant-numeric: tabular-nums;
+}
+
+.rpt-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid var(--green-dark);
+}
+.rpt-footer-card {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 14px;
+  text-align: center;
+}
+.rpt-footer-num {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.rpt-footer-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+/* Print styling — single-page, no chrome */
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  html, body { background: #fff !important; }
+  .mgr-sidebar, .mgr-topbar, .mgr-loader-overlay, #toast,
+  .mgr-actions, .no-print { display: none !important; }
+  .mgr-layout { grid-template-columns: 1fr !important; display: block !important; }
+  .mgr-main { display: block !important; }
+  .mgr-body { padding: 0 !important; }
+  .report-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+  }
+  .rpt-port, .rpt-block, .rpt-total-card, .rpt-footer-card, .rpt-chart {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .rpt-port, .rpt-block, .rpt-total-card, .rpt-footer-card,
+  .rpt-port-name, .rpt-block-title, .rpt-metric-value, .rpt-total-num,
+  .rpt-footer-num, .rpt-section-title {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
