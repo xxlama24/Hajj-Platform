@@ -5,6 +5,8 @@
 (function () {
   'use strict';
 
+  var SECTION_NAMES_AR = { 1: 'الاستعداد المسبق', 2: 'التفويج والمغادرة', 3: 'زيارة الروضة', 4: 'الرعاية الصحية', 5: 'نسك', 6: 'السكن', 7: 'الميقات' };
+
   var SECTIONS = [
     { num: 1, name: 'Section 1', href: 'dashboard1.html' },
     { num: 2, name: 'Section 2', href: 'dashboard2.html' },
@@ -18,13 +20,13 @@
   ];
 
   var ROLE_LABELS = {
-    section_1: 'Section 1',
-    section_2: 'Section 2',
-    section_3: 'Section 3',
-    section_4: 'Section 4',
-    section_5: 'Section 5',
-    section_6: 'Section 6',
-    section_7: 'Section 7',
+    section_1: SECTION_NAMES_AR[1],
+    section_2: SECTION_NAMES_AR[2],
+    section_3: SECTION_NAMES_AR[3],
+    section_4: SECTION_NAMES_AR[4],
+    section_5: SECTION_NAMES_AR[5],
+    section_6: SECTION_NAMES_AR[6],
+    section_7: SECTION_NAMES_AR[7],
     full_access: 'Admin',
     manager: 'Manager'
   };
@@ -39,6 +41,8 @@
     try { localStorage.removeItem('user'); } catch (e) {}
     window.location.href = '../login.html';
   };
+
+  MGR.sectionName = function (n) { return SECTION_NAMES_AR[n] || ('القسم ' + n); };
 
   MGR.allowedSection = function (user) {
     if (!user) return null;
@@ -151,11 +155,11 @@
         var a = document.createElement('a');
         a.className = 'mgr-nav-link' + (s.num === currentSectionNum ? ' active' : '');
         a.href = s.href;
-        a.title = s.name;
+        a.title = (s.aggregate || s.report) ? s.name : MGR.sectionName(s.num);
         var label;
         if (s.aggregate) label = 'تجميع البلاغات والشكاوى والمحاضر';
         else if (s.report) label = 'التقرير اليومي';
-        else label = 'القسم ' + s.num;
+        else label = MGR.sectionName(s.num);
         var labelSpan = document.createElement('span');
         labelSpan.textContent = label;
         var numSpan = document.createElement('span');
@@ -253,7 +257,7 @@
       var secOpts = '<option value="">كل الأقسام</option>';
       for (var i = 1; i <= 7; i++) {
         secOpts += '<option value="' + i + '"' + (String(p.section_number) === String(i) ? ' selected' : '') + '>'
-                + 'القسم ' + i + '</option>';
+                + MGR.sectionName(i) + '</option>';
       }
       add('القسم', '<select id="f-section">' + secOpts + '</select>');
     }

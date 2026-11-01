@@ -273,7 +273,7 @@
             columns = [
               { key: '_idx', fn: function (_, i) { return (page - 1) * pageSize + i + 1; } },
               { key: 'shift_date' },
-              { key: 'section_number' },
+              { key: 'section_number', fn: function (r) { return MGR.sectionName(r.section_number); } },
               { key: 'report_number' },
               { key: 'violation_name' },
               { key: 'location_name' },
@@ -293,7 +293,7 @@
             columns = [
               { key: '_idx', fn: function (_, i) { return (page - 1) * pageSize + i + 1; } },
               { key: 'shift_date' },
-              { key: 'section_number' },
+              { key: 'section_number', fn: function (r) { return MGR.sectionName(r.section_number); } },
               { key: 'case_number' },
               { key: 'type' },
               { key: 'source_party_name' },
